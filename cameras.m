@@ -1,7 +1,7 @@
 function list = cameras()
-	list = {'YAG'         , 'YAGS:LI20:2432', 1, 1;
+	list = {'YAG'         , 'YAGS:LI20:2432', 0, 1;
 		'LASER'       , 'PROF:LI20:3185', 0, 1;
-		'USTHz'       , 'OTRS:LI20:3070', 0, 2;
+		'USTHz'       , 'OTRS:LI20:3070', 1, 2;
 		'DSTHz'       , 'OTRS:LI20:3075', 0, 3;
 		'IPOTR'       , 'OTRS:LI20:3180', 0, 3;
 		'ODROTR'      , 'OTRS:LI20:3175', 0, 4;
