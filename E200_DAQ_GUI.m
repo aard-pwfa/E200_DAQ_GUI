@@ -22,7 +22,7 @@ function varargout = E200_DAQ_GUI(varargin)
 
 % Edit the above text to modify the response to help E200_DAQ_GUI
 
-% Last Modified by GUIDE v2.5 16-Nov-2013 17:23:25
+% Last Modified by GUIDE v2.5 19-Dec-2013 14:11:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,6 +63,14 @@ handles=scanDefaults(hObject,handles);
 
 guidata(hObject,handles);
 
+camlist = cameras();
+str = [strcat(num2str(cell2mat(camlist(:,4))), ' - ', 	camlist(:,1))];
+set(handles.Cameralist,'String',str);
+% display(get(handles.Cameralist,'Value'));
+camind = find(cell2mat(camlist(:,3)));
+set(handles.Cameralist,'Value',camind');
+
+camdisplay(handles);
 
 % UIWAIT makes E200_DAQ_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -102,45 +110,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function Camconfignumber_Callback(hObject, eventdata, handles)
-% hObject    handle to Camconfignumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Camconfignumber as text
-%        str2double(get(hObject,'String')) returns contents of Camconfignumber as a double
-
-set(handles.Cameralist,'String','');
-
-val=str2num(get(hObject,'String'));
-
-par=E200_Param;
-par.camera_config=val;
-
-par=E200_Cam_Configs(par);
-
-par.cams
-
-cameras = par.cams(:,1);
-%if get(handles.UseCMOS,'value'); cameras = [cameras; 'CMOS']; end
-set(handles.Cameralist,'String',cameras);
-
-
-
-% --- Executes during object creation, after setting all properties.
-function Camconfignumber_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Camconfignumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --- Executes on selection change in Cameralist.
 function Cameralist_Callback(hObject, eventdata, handles)
 % hObject    handle to Cameralist (see GCBO)
@@ -149,6 +118,9 @@ function Cameralist_Callback(hObject, eventdata, handles)
 
 % Hints: contents = get(hObject,'String') returns Cameralist contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from Cameralist
+
+% display(get(hObject,'Value'))
+camdisplay(handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -170,60 +142,7 @@ function Rundaq_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global hl;
-hl=handles;
-
-par=E200_Param;
-% 
-par.experiment=get(handles.ExperimentStr,'String')
-par.camera_config=str2num(get(handles.Camconfignumber,'String'));
-temppar=par;
-temppar=E200_Cam_Configs(par);
-
-if get(handles.Eventcode213,'Value')
-    par.event_code=213;
-elseif get(handles.Eventcode53,'Value')
-    par.event_code=53;
-else
-    error('Choose and event code!');
-end
-
-par.save_facet=get(handles.Savefacet,'Value');
-par.save_E200=get(handles.SaveE200,'Value');
-par.save_back=get(handles.Savebackground,'Value');
-par.set_print2elog=get(handles.Print2elog,'Value');
-par.aida_daq=get(handles.AIDAdaq,'Value');
-par.n_shot=str2num(get(handles.Numberofshots,'String'));
-par.cmos_n_shot=str2num(get(handles.Numberofshots,'String'));
-
-% CMOS stuff
-%par.run_cmos = get(handles.UseCMOS,'Value');
-%[day,rem]=strtok(datestr(now),'-');
-%[month,rem]=strtok(rem,'-');
-%date_path = ['/media/CMOS_Volume/data/' month '_' day];
-%E200_setNum = lcaGetSmart('SIOC:SYS1:ML02:AO001')+1;
-%E200_dir = ['/E200_' num2str(E200_setNum) '/'];
-%par.cmos_path = [date_path E200_dir];
-par.cmos_file = 'data_step_01';
-
-par.comt_str=get(handles.Commentstring,'String');
-
-if get(handles.Daqscan,'Value')
-    startval=str2num(get(handles.Scanstartval,'String'));
-    endval=str2num(get(handles.Scanendval,'String'));
-    stepsval=str2num(get(handles.Scanstepsval,'String'));
-    switch get(handles.Scanfunction,'Value')
-        case {1, 2, 3, 5}
-            E200_gen_scan(handles.func,startval,endval,stepsval,par);
-        case 4
-            E200_Dispersion_Scan(startval,endval,stepsval,par.n_shot,par.camera_config);
-    end
-else
-    E200_DAQ_2013(par);
-end
-
-display('Data Acquisition Successfully Taken via GUI');
-
+rundaq(handles)
 
 function Commentstring_Callback(hObject, eventdata, handles)
 % hObject    handle to Commentstring (see GCBO)
@@ -512,5 +431,28 @@ handles.func(str2num(get(handles.Setfunctionval,'String')));
 %     cameras = cameras(~cm_ind);
 %     set(handles.Cameralist,'String',cameras);
 % end
+
+
+
+function camDisplay_Callback(hObject, eventdata, handles)
+% hObject    handle to camDisplay (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of camDisplay as text
+%        str2double(get(hObject,'String')) returns contents of camDisplay as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function camDisplay_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to camDisplay (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 
