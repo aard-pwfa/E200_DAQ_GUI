@@ -59,6 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 %addpath('/usr/local/facet/tools/matlab/toolbox/facet_daq/E200_DAQ_GUI_path/');
+addpath('/home/fphysics/joelfred/matlab_mv/toolbox/facet_daq');
 handles=scanDefaults(hObject,handles);
 
 guidata(hObject,handles);
