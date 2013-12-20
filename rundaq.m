@@ -52,7 +52,7 @@ function rundaq(handles)
 	    endval=str2num(get(handles.Scanendval,'String'));
 	    stepsval=str2num(get(handles.Scanstepsval,'String'));
 	    switch get(handles.Scanfunction,'Value')
-	        case {1, 2, 3, 5}
+	        case {1, 2, 3, 5, 6, 7}
 	            E200_gen_scan(handles.func,startval,endval,stepsval,par);
 	        case 4
 	            E200_Dispersion_Scan(startval,endval,stepsval,par.n_shot,par.camera_config);
