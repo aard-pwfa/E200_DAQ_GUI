@@ -59,19 +59,23 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 %addpath('/usr/local/facet/tools/matlab/toolbox/facet_daq/E200_DAQ_GUI_path/');
-addpath('/home/fphysics/joelfred/matlab_mv/toolbox/facet_daq');
+% addpath('/home/fphysics/joelfred/matlab_mv/toolbox/facet_daq');
 handles=scanDefaults(hObject,handles);
 
-guidata(hObject,handles);
+% guidata(hObject,handles);
 
-camlist = cameras();
-str = [strcat(num2str(cell2mat(camlist(:,4))), ' - ', 	camlist(:,1))];
-set(handles.Cameralist,'String',str);
+camlist = cam_list();
+handles.camlist=camlist;
+% str = [strcat(num2str(cell2mat(camlist(:,4))), ' - ', 	camlist(:,1))];
+set(handles.Cameralist,'String',camlist.AD_CAMS.NAMES);
 % display(get(handles.Cameralist,'Value'));
-camind = find(cell2mat(camlist(:,3)));
-set(handles.Cameralist,'Value',camind');
+% camind = find(cell2mat(camlist(:,3)));
+% set(handles.Cameralist,'Value',camind');
 
 camdisplay(handles);
+guidata(hObject,handles);
+global hl;
+hl=handles;
 
 % UIWAIT makes E200_DAQ_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -143,7 +147,7 @@ function Rundaq_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-rundaq(handles)
+rundaq(handles);
 
 function Commentstring_Callback(hObject, eventdata, handles)
 % hObject    handle to Commentstring (see GCBO)
